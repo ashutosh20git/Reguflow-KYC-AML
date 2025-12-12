@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ReguFlow – Compliance Automation (KYC & AML)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050816;
+      --bg-alt: #0b1020;
+      --card: #10172a;
+      --accent: #3b82f6;
+      --accent-soft: rgba(59,130,246,0.14);
+      --accent-2: #22c55e;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger: #ef4444;
+      --border-subtle: #1f2937;
+      --shadow-soft: 0 20px 40px rgba(0,0,0,0.45);
+      --radius-xl: 1.5rem;
+      --radius-lg: 1rem;
+      --radius-full: 999px;
+      --transition: 180ms ease-out;
+      --font-main: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background: radial-gradient(circle at top, #1e293b 0, #020617 45%, #000 100%);
+      color: var(--text-main);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    /* Layout */
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: radial-gradient(circle at 0% 0%, rgba(56,189,248,0.1) 0, transparent 45%),
+                  radial-gradient(circle at 100% 0%, rgba(59,130,246,0.25) 0, transparent 45%),
+                  radial-gradient(circle at 50% 100%, rgba(34,197,94,0.15) 0, transparent 45%),
+                  var(--bg);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 1.25rem;
+    }
+
+    /* Navbar */
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+      background: linear-gradient(to bottom, rgba(15,23,42,0.95), rgba(15,23,42,0.7));
+      border-bottom: 1px solid rgba(15,23,42,0.9);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.9rem 0;
+      gap: 1.25rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .brand-logo {
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      background: radial-gradient(circle at 20% 0%, #e5e7eb 0, #60a5fa 15%, #1d4ed8 40%, #0f172a 100%);
+      box-shadow: 0 0 0 1px rgba(148,163,184,0.3), 0 8px 18px rgba(15,23,42,0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #e5e7eb;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.05rem;
+    }
+
+    .brand-title {
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      font-size: 0.98rem;
+    }
+
+    .brand-tagline {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      font-size: 0.9rem;
+    }
+
+    .nav-link {
+      color: var(--text-muted);
+      position: relative;
+      padding-bottom: 0.15rem;
+      cursor: pointer;
+    }
+
+    .nav-link::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 0;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width var(--transition);
+    }
+
+    .nav-link:hover {
+      color: var(--text-main);
+    }
+
+    .nav-link:hover::after {
+      width: 60%;
+    }
+
+    .nav-cta {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .btn {
+      border-radius: var(--radius-full);
+      padding: 0.5rem 1.15rem;
+      font-size: 0.85rem;
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      white-space: nowrap;
+      transition: transform 140ms ease-out, box-shadow 140ms ease-out, border-color 140ms ease-out, background 140ms ease-out, color 140ms ease-out;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #0ea5e9);
+      color: white;
+      box-shadow: 0 10px 25px rgba(37,99,235,0.65);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(37,99,235,0.8);
+    }
+
+    .btn-ghost {
+      border-color: rgba(148,163,184,0.6);
+      color: var(--text-muted);
+      background: radial-gradient(circle at top, rgba(148,163,184,0.16) 0, transparent 65%);
+    }
+
+    .btn-ghost:hover {
+      border-color: rgba(209,213,219,0.9);
+      color: var(--text-main);
+      background: linear-gradient(to right, rgba(148,163,184,0.16), transparent);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      border-radius: 999px;
+      padding: 0.25rem 0.7rem 0.25rem 0.3rem;
+      border: 1px solid rgba(148,163,184,0.4);
+      background: radial-gradient(circle at left, rgba(34,197,94,0.2) 0, transparent 60%);
+      color: var(--text-main);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      width: fit-content;
+    }
+
+    .badge-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 0%, #bbf7d0 0, #22c55e 35%, #15803d 100%);
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.28);
+    }
+
+    .badge-text {
+      opacity: 0.9;
+    }
+
+    /* Hero */
+
+    header.hero {
+      padding: 2.5rem 0 3.5rem;
+    }
+
+    .hero-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr);
+      gap: 2.5rem;
+      align-items: center;
+    }
+
+    .hero-title {
+      font-size: clamp(2.3rem, 4vw, 3.1rem);
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      margin-bottom: 1rem;
+    }
+
+    .hero-title span {
+      background: linear-gradient(120deg, #60a5fa, #a5b4fc, #22c55e);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 0.98rem;
+      color: var(--text-muted);
+      max-width: 34rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .hero-highlight {
+      color: #bfdbfe;
+      font-weight: 500;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .hero-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .hero-pill {
+      border-radius: 999px;
+      padding: 0.18rem 0.7rem;
+      border: 1px solid rgba(148,163,184,0.5);
+      background-color: rgba(15,23,42,0.65);
+    }
+
+    .hero-pill strong {
+      color: #e5e7eb;
+      font-weight: 600;
+    }
+
+    .hero-visual {
+      position: relative;
+    }
+
+    .hero-card {
+      background: radial-gradient(circle at top, rgba(56,189,248,0.22) 0, rgba(15,23,42,0.98) 36%, #020617 100%);
+      border-radius: 2rem;
+      padding: 1.7rem 1.4rem 1.6rem;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148,163,184,0.4);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      font-size: 0.8rem;
+    }
+
+    .hero-card-title {
+      display: flex;
+      flex-direction: column;
+      gap: 0.12rem;
+    }
+
+    .hero-card-title span:first-child {
+      font-weight: 600;
+    }
+
+    .hero-card-title span:last-child {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+
+    .hero-chip {
+      border-radius: 999px;
+      border: 1px solid rgba(74,222,128,0.6);
+      background: rgba(22,163,74,0.35);
+      padding: 0.06rem 0.6rem;
+      font-size: 0.7rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: #bbf7d0;
+    }
+
+    .hero-chip-icon {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #4ade80;
+      box-shadow: 0 0 0 3px rgba(74,222,128,0.4);
+    }
+
+    .timeline {
+      background-color: rgba(15,23,42,0.75);
+      border-radius: 1.2rem;
+      padding: 0.75rem 0.35rem;
+      border: 1px solid rgba(31,41,55,0.8);
+      display: grid;
+      grid-template-columns: 1.1fr 1.1fr;
+      gap: 0.5rem;
+    }
+
+    .timeline-col-title {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      padding: 0 0.7rem 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .timeline-list {
+      list-style: none;
+      padding: 0.1rem 0.3rem 0.1rem 0.6rem;
+      border-left: 1px dashed rgba(148,163,184,0.55);
+      margin-left: 0.5rem;
+    }
+
+    .timeline-item {
+      margin-bottom: 0.5rem;
+      position: relative;
+      padding-left: 0.7rem;
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: -0.46rem;
+      top: 0.45rem;
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 35% 0%, #e5e7eb 0, #60a5fa 40%, #1d4ed8 100%);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.34);
+    }
+
+    .timeline-label {
+      font-size: 0.78rem;
+      margin-bottom: 0.08rem;
+    }
+
+    .timeline-sub {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .badge-floating {
+      position: absolute;
+      right: 1rem;
+      bottom: 1rem;
+      background: radial-gradient(circle at top, rgba(56,189,248,0.35) 0, rgba(15,23,42,0.96) 46%);
+      border-radius: 1.5rem;
+      padding: 0.6rem 0.9rem;
+      border: 1px solid rgba(148,163,184,0.6);
+      font-size: 0.76rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.16rem;
+      max-width: 11rem;
+    }
+
+    .badge-floating strong {
+      color: #bfdbfe;
+      font-weight: 600;
+    }
+
+    .badge-floating span {
+      color: var(--text-muted);
+      font-size: 0.72rem;
+    }
+
+    /* Sections */
+
+    section {
+      padding: 2.8rem 0;
+    }
+
+    .section-header {
+      text-align: left;
+      margin-bottom: 1.7rem;
+    }
+
+    .section-kicker {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .section-subtitle {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      max-width: 34rem;
+    }
+
+    /* Features */
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      background: radial-gradient(circle at top, rgba(30,64,175,0.45) 0, rgba(15,23,42,0.96) 55%);
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(148,163,184,0.4);
+      padding: 1.15rem 1.1rem 1.1rem;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 0 0, rgba(56,189,248,0.35) 0, transparent 55%);
+      opacity: 0;
+      transition: opacity var(--transition);
+      pointer-events: none;
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-compact {
+      border-radius: 1.1rem;
+      background: radial-gradient(circle at top, rgba(15,23,42,0.98) 0, rgba(15,23,42,1) 55%);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.9);
+    }
+
+    .card-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 0.9rem;
+      background: radial-gradient(circle at 20% 0%, #e5e7eb 0, #a5b4fc 18%, #4f46e5 55%, #020617 100%);
+      box-shadow: 0 10px 22px rgba(30,64,175,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .card-title {
+      font-size: 0.98rem;
+      margin-bottom: 0.2rem;
+      font-weight: 600;
+    }
+
+    .card-body {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      font-size: 0.72rem;
+    }
+
+    .tag {
+      padding: 0.12rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      background-color: rgba(15,23,42,0.85);
+      color: #cbd5f5;
+      white-space: nowrap;
+    }
+
+    /* Workflow */
+
+    .workflow {
+      display: grid;
+      grid-template-columns: 1.1fr 1.1fr;
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+
+    .steps {
+      list-style: none;
+      margin-top: 0.4rem;
+    }
+
+    .step {
+      display: flex;
+      gap: 0.7rem;
+      margin-bottom: 0.75rem;
+      align-items: flex-start;
+    }
+
+    .step-index {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      color: #bfdbfe;
+      background: radial-gradient(circle at top, rgba(59,130,246,0.3) 0, rgba(15,23,42,0.95) 60%);
+      flex-shrink: 0;
+    }
+
+    .step-main {
+      font-size: 0.86rem;
+    }
+
+    .step-main strong {
+      display: block;
+      margin-bottom: 0.08rem;
+      font-weight: 600;
+    }
+
+    .step-main span {
+      color: var(--text-muted);
+    }
+
+    .code-card {
+      border-radius: 1.1rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background-color: #020617;
+      box-shadow: 0 18px 40px rgba(15,23,42,0.95);
+      padding: 0.65rem 0.9rem 0.9rem;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.75rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.45rem;
+    }
+
+    .code-dots {
+      display: flex;
+      gap: 0.18rem;
+    }
+
+    .code-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background-color: #27272a;
+    }
+
+    .code-dot:nth-child(1) { background-color: #f97373; }
+    .code-dot:nth-child(2) { background-color: #facc15; }
+    .code-dot:nth-child(3) { background-color: #4ade80; }
+
+    .code-title {
+      color: #9ca3af;
+    }
+
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .code-key {
+      color: #60a5fa;
+    }
+    .code-str {
+      color: #f97316;
+    }
+    .code-num {
+      color: #facc15;
+    }
+    .code-kw {
+      color: #22c55e;
+    }
+    .code-cmt {
+      color: #6b7280;
+      font-style: italic;
+    }
+
+    /* Pricing */
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: minmax(0,1.1fr) minmax(0,1.1fr);
+      gap: 1.4rem;
+      align-items: stretch;
+    }
+
+    .price-card {
+      border-radius: 1.3rem;
+      border: 1px solid rgba(148,163,184,0.65);
+      background: radial-gradient(circle at top, rgba(59,130,246,0.4) 0, rgba(15,23,42,0.98) 48%, #020617 100%);
+      padding: 1.2rem 1.1rem 1.3rem;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .price-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #bfdbfe;
+      margin-bottom: 0.25rem;
+    }
+
+    .price-main {
+      display: flex;
+      align-items: baseline;
+      gap: 0.35rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .price-main span:nth-child(1) {
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .price-main span:nth-child(2) {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .price-desc {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      margin-bottom: 0.7rem;
+    }
+
+    .price-list {
+      list-style: none;
+      font-size: 0.82rem;
+      display: grid;
+      gap: 0.38rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .price-list li {
+      display: flex;
+      gap: 0.45rem;
+      align-items: flex-start;
+    }
+
+    .price-bullet {
+      font-size: 0.9rem;
+      color: #4ade80;
+      line-height: 1.4;
+    }
+
+    .pill {
+      font-size: 0.7rem;
+      border-radius: 999px;
+      padding: 0.13rem 0.7rem;
+      border: 1px solid rgba(148,163,184,0.6);
+      color: #cbd5f5;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
+    /* Contact */
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: minmax(0,1.1fr) minmax(0,1.1fr);
+      gap: 1.4rem;
+      align-items: flex-start;
+    }
+
+    form {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 0.18rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    input, select, textarea {
+      background-color: rgba(15,23,42,0.88);
+      border-radius: 0.7rem;
+      border: 1px solid var(--border-subtle);
+      padding: 0.55rem 0.7rem;
+      font-size: 0.85rem;
+      color: var(--text-main);
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition), background-color var(--transition);
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #6b7280;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(59,130,246,0.55);
+      background-color: rgba(15,23,42,0.96);
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .field-error {
+      font-size: 0.72rem;
+      color: var(--danger);
+      margin-top: 0.16rem;
+      display: none;
+    }
+
+    .form-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .form-note {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      max-width: 13rem;
+    }
+
+    .form-note strong {
+      color: #e5e7eb;
+    }
+
+    .contact-highlight {
+      border-radius: 1.3rem;
+      border: 1px solid rgba(148,163,184,0.6);
+      background: radial-gradient(circle at top, rgba(34,197,94,0.5) 0, rgba(15,23,42,0.98) 48%, #020617 100%);
+      padding: 1rem 1rem 1.1rem;
+      box-shadow: var(--shadow-soft);
+      font-size: 0.88rem;
+    }
+
+    .contact-highlight h3 {
+      font-size: 1rem;
+      margin-bottom: 0.45rem;
+    }
+
+    .contact-highlight p {
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .contact-meta {
+      display: grid;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+    }
+
+    .contact-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #4ade80;
+      box-shadow: 0 0 0 3px rgba(74,222,128,0.28);
+    }
+
+    /* Footer */
+
+    footer {
+      border-top: 1px solid rgba(15,23,42,1);
+      background-color: #020617;
+      padding: 1.2rem 0 1.4rem;
+      margin-top: 2rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+    }
+
+    .footer-links a:hover {
+      color: var(--text-main);
+    }
+
+    /* Toast */
+
+    .toast {
+      position: fixed;
+      bottom: 1.2rem;
+      right: 1.2rem;
+      background: radial-gradient(circle at top, rgba(34,197,94,0.4) 0, rgba(15,23,42,0.98) 60%);
+      border-radius: 1rem;
+      border: 1px solid rgba(34,197,94,0.75);
+      box-shadow: 0 16px 35px rgba(0,0,0,0.8);
+      padding: 0.75rem 1rem;
+      font-size: 0.8rem;
+      display: none;
+      z-index: 60;
+      max-width: 16rem;
+    }
+
+    .toast strong {
+      display: block;
+      margin-bottom: 0.2rem;
+      color: #bbf7d0;
+    }
+
+    .toast-close {
+      position: absolute;
+      top: 0.35rem;
+      right: 0.6rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #a7f3d0;
+    }
+
+    /* Responsive */
+
+    .nav-toggle {
+      display: none;
+      border-radius: 999px;
+      padding: 0.3rem 0.6rem;
+      border: 1px solid rgba(148,163,184,0.6);
+      background: rgba(15,23,42,0.9);
+      cursor: pointer;
+      font-size: 0.75rem;
+      color: var(--text-main);
+    }
+
+    @media (max-width: 900px) {
+      .hero-inner {
+        grid-template-columns: minmax(0,1fr);
+      }
+
+      .hero-visual {
+        order: -1;
+      }
+
+      .features-grid {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+      }
+
+      .workflow,
+      .pricing-grid,
+      .contact-grid {
+        grid-template-columns: minmax(0,1fr);
+      }
+    }
+
+    @media (max-width: 720px) {
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        padding: 0.8rem 1.25rem 1rem;
+        background: radial-gradient(circle at top, rgba(15,23,42,0.98) 0, rgba(15,23,42,1) 65%);
+        border-bottom: 1px solid rgba(15,23,42,1);
+      }
+
+      .nav-links.open {
+        display: flex;
+      }
+
+      .nav-cta {
+        justify-content: flex-start;
+      }
+
+      .nav-toggle {
+        display: inline-flex;
+      }
+
+      .hero-title {
+        font-size: 2rem;
+      }
+
+      .features-grid {
+        grid-template-columns: minmax(0,1fr);
+      }
+
+      .badge-floating {
+        position: relative;
+        right: auto;
+        bottom: auto;
+        margin-top: 0.8rem;
+      }
+
+      .hero-card {
+        padding: 1.3rem 1rem 1.2rem;
+      }
+
+      .hero {
+        padding-top: 2rem;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <div class="container nav-inner">
+        <div class="brand">
+          <div class="brand-logo">R</div>
+          <div class="brand-text">
+            <div class="brand-title">ReguFlow</div>
+            <div class="brand-tagline">KYC &amp; AML Automation</div>
+          </div>
+        </div>
+        <button class="nav-toggle" id="navToggle">Menu</button>
+        <div class="nav-links" id="navLinks">
+          <span class="nav-link" data-scroll="#features">Features</span>
+          <span class="nav-link" data-scroll="#workflow">Workflow</span>
+          <span class="nav-link" data-scroll="#pricing">Pricing</span>
+          <span class="nav-link" data-scroll="#contact">Contact</span>
+          <div class="nav-cta">
+            <button class="btn btn-ghost" data-scroll="#contact">Talk to us</button>
+            <button class="btn btn-primary" data-scroll="#contact">Book a demo ▸</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="container hero-inner">
+        <div>
+          <div class="badge">
+            <div class="badge-dot"></div>
+            <div class="badge-text">Live rules engine for KYC &amp; AML</div>
+          </div>
+          <h1 class="hero-title">
+            Automate <span>compliance workflows</span> from KYC to ongoing AML.
+          </h1>
+          <p class="hero-subtitle">
+            ReguFlow plugs into your onboarding, screens customers against global watchlists,
+            scores risk in real time, and keeps an auditable trail for regulators – all with
+            <span class="hero-highlight">zero-code workflows.</span>
+          </p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" data-scroll="#contact">
+              Get a 30-minute demo
+            </button>
+            <button class="btn btn-ghost" data-scroll="#features">
+              Explore features
+            </button>
+          </div>
+          <div class="hero-meta">
+            <div class="hero-meta-item hero-pill">
+              <strong>80% faster</strong> KYC review cycles
+            </div>
+            <div class="hero-meta-item">
+              <span class="dot"></span>
+              <span>Auto-archived cases &amp; audit trails</span>
+            </div>
+            <div class="hero-meta-item">
+              <span class="dot"></span>
+              <span>PSD2, FATF &amp; GDPR-aware defaults</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="hero-card">
+            <div class="hero-card-header">
+              <div class="hero-card-title">
+                <span>Real-time KYC Queue</span>
+                <span>Last synced: 12 seconds ago</span>
+              </div>
+              <div class="hero-chip">
+                <span class="hero-chip-icon"></span>
+                SLA: &lt; 2 min / case
+              </div>
+            </div>
+            <div class="timeline">
+              <div>
+                <div class="timeline-col-title">Incoming</div>
+                <ul class="timeline-list">
+                  <li class="timeline-item">
+                    <div class="timeline-label">
+                      John Doe • <span class="hero-highlight">Onboarding</span>
+                    </div>
+                    <div class="timeline-sub">
+                      ID &amp; address verified • 2 hits on PEP
+                    </div>
+                  </li>
+                  <li class="timeline-item">
+                    <div class="timeline-label">
+                      Acme Corp • Business KYC
+                    </div>
+                    <div class="timeline-sub">
+                      UBO tree resolved • KYB docs pending e-sign
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <div class="timeline-col-title">Decisions</div>
+                <ul class="timeline-list">
+                  <li class="timeline-item">
+                    <div class="timeline-label">
+                      Auto-approve • Low risk
+                    </div>
+                    <div class="timeline-sub">
+                      Rules: residency, device, document trust
+                    </div>
+                  </li>
+                  <li class="timeline-item">
+                    <div class="timeline-label">
+                      Escalated • Tier-2 review
+                    </div>
+                    <div class="timeline-sub">
+                      Reason: match on sanctions + unusual IP
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="badge-floating">
+              <strong>42 cases auto-cleared today</strong>
+              <span>Manual review time reduced by 63% vs last month.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- FEATURES -->
+    <section id="features">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-kicker">Platform</div>
+          <h2 class="section-title">Everything you need for modern KYC &amp; AML automation.</h2>
+          <p class="section-subtitle">
+            Build flows visually, plug in your data vendors, and keep your compliance team in control
+            with explainable rules – not black-box scoring that regulators hate.
+          </p>
+        </div>
+        <div class="features-grid">
+          <div class="card card-compact">
+            <div class="card-icon">⚙️</div>
+            <div class="card-title">Zero-code rules engine</div>
+            <p class="card-body">
+              Design KYC &amp; AML flows in a drag-and-drop canvas: verify identity, run watchlist checks,
+              trigger enhanced due diligence, or auto-close low-risk cases.
+            </p>
+            <div class="card-tags">
+              <span class="tag">Visual workflows</span>
+              <span class="tag">Per-segment logic</span>
+              <span class="tag">A/B rules testing</span>
+            </div>
+          </div>
+          <div class="card card-compact">
+            <div class="card-icon">🕵️</div>
+            <div class="card-title">Global KYC coverage</div>
+            <p class="card-body">
+              Plug-and-play integrations into vendors for ID verification, sanctions &amp; PEP lists,
+              adverse media, device signals, and transactional data.
+            </p>
+            <div class="card-tags">
+              <span class="tag">Sanctions &amp; PEP</span>
+              <span class="tag">Adverse media</span>
+              <span class="tag">Doc &amp; selfie checks</span>
+            </div>
+          </div>
+          <div class="card card-compact">
+            <div class="card-icon">📚</div>
+            <div class="card-title">Audit-ready case history</div>
+            <p class="card-body">
+              Every decision is logged: data used, rule path, overrides, reviewer notes, and timestamps.
+              Export in one click for regulators or internal audit.
+            </p>
+            <div class="card-tags">
+              <span class="tag">Immutable log</span>
+              <span class="tag">Exporter</span>
+              <span class="tag">Reviewer comments</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORKFLOW -->
+    <section id="workflow">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-kicker">How it works</div>
+          <h2 class="section-title">From signup to decision in under 2 minutes.</h2>
+          <p class="section-subtitle">
+            ReguFlow sits between your product and your data providers. Every applicant flows
+            through a consistent, transparent decisioning pipeline.
+          </p>
+        </div>
+        <div class="workflow">
+          <div>
+            <ul class="steps">
+              <li class="step">
+                <div class="step-index">1</div>
+                <div class="step-main">
+                  <strong>Collect data from your existing forms.</strong>
+                  <span>Use our API or SDKs to stream application data, documents, and device context into
+                    ReguFlow as the user completes your onboarding.</span>
+                </div>
+              </li>
+              <li class="step">
+                <div class="step-index">2</div>
+                <div class="step-main">
+                  <strong>Run KYC &amp; AML checks in parallel.</strong>
+                  <span>Kick off ID verification, sanctions &amp; PEP screening, fraud rules, and custom
+                    logic based on customer type or geography.</span>
+                </div>
+              </li>
+              <li class="step">
+                <div class="step-index">3</div>
+                <div class="step-main">
+                  <strong>Score risk &amp; decide automatically.</strong>
+                  <span>Combine scores and rules into a final decision: approve, reject, or escalate to a
+                    human reviewer queue with all the context they need.</span>
+                </div>
+              </li>
+              <li class="step">
+                <div class="step-index">4</div>
+                <div class="step-main">
+                  <strong>Stream decisions back to your product.</strong>
+                  <span>We return a final decision and explanation so your UI can instantly move the user
+                    forward, ask for more info, or deny access.</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="code-card">
+            <div class="code-header">
+              <div class="code-dots">
+                <div class="code-dot"></div>
+                <div class="code-dot"></div>
+                <div class="code-dot"></div>
+              </div>
+              <div class="code-title">Example: decision API</div>
+            </div>
+<pre><span class="code-cmt">// 1. Send applicant data to ReguFlow</span>
+<span class="code-kw">POST</span> <span class="code-str">/v1/kyc/decision</span>
+<span class="code-key">body</span>: {
+  <span class="code-key">customer_id</span>: <span class="code-str">"usr_123"</span>,
+  <span class="code-key">name</span>: <span class="code-str">"John Doe"</span>,
+  <span class="code-key">dob</span>: <span class="code-str">"1993-05-14"</span>,
+  <span class="code-key">country</span>: <span class="code-str">"DE"</span>,
+  <span class="code-key">document</span>: {
+    <span class="code-key">type</span>: <span class="code-str">"passport"</span>,
+    <span class="code-key">number</span>: <span class="code-str">"C1234567"</span>
+  }
+}
+
+<span class="code-cmt">// 2. ReguFlow runs KYC, AML &amp; risk rules</span>
+
+<span class="code-key">response</span> = {
+  <span class="code-key">decision</span>: <span class="code-str">"approve"</span>,
+  <span class="code-key">risk_score</span>: <span class="code-num">0.21</span>,
+  <span class="code-key">reason</span>: <span class="code-str">"No watchlist hits, low geo-risk."</span>,
+  <span class="code-key">checks</span>: [<span class="code-str">"document_verification"</span>, <span class="code-str">"pep_screening"</span>]
+}</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRICING -->
+    <section id="pricing">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-kicker">Pricing</div>
+          <h2 class="section-title">Simple, usage-based pricing that scales with you.</h2>
+          <p class="section-subtitle">
+            Start small while you validate your onboarding journeys, then scale to millions of checks
+            without renegotiating contracts every month.
+          </p>
+        </div>
+        <div class="pricing-grid">
+          <div class="price-card">
+            <div class="price-label">Launch</div>
+            <div class="price-main">
+              <span>$0</span>
+              <span>+ pay per KYC check</span>
+            </div>
+            <p class="price-desc">
+              Perfect for early-stage teams that want enterprise-grade compliance foundations without
+              annual minimums.
+            </p>
+            <ul class="price-list">
+              <li>
+                <span class="price-bullet">•</span>
+                <span>Up to <strong>1,000</strong> KYC decisions / month</span>
+              </li>
+              <li>
+                <span class="price-bullet">•</span>
+                <span>1 environment (production) + audit exports</span>
+              </li>
+              <li>
+                <span class="price-bullet">•</span>
+                <span>Email support with 1-business-day SLA</span>
+              </li>
+            </ul>
+            <button class="btn btn-primary" data-scroll="#contact">
+              Get started ▸
+            </button>
+          </div>
+
+          <div class="price-card">
+            <div class="pill" style="margin-bottom:0.45rem;">
+              <span class="pill-dot"></span>
+              <span>Most popular for scale-ups</span>
+            </div>
+            <div class="price-label">Growth &amp; Enterprise</div>
+            <div class="price-main">
+              <span>Custom</span>
+              <span>per-check &amp; volume tiers</span>
+            </div>
+            <p class="price-desc">
+              Tailored contracts for payments, crypto, lending, neobanks, and other regulated
+              businesses that need flexible coverage and SLAs.
+            </p>
+            <ul class="price-list">
+              <li>
+                <span class="price-bullet">•</span>
+                <span>Multi-region data residency &amp; SSO</span>
+              </li>
+              <li>
+                <span class="price-bullet">•</span>
+                <span>Custom workflows, tiers, &amp; vendor routing</span>
+              </li>
+              <li>
+                <span class="price-bullet">•</span>
+                <span>Dedicated CSM &amp; compliance solutions partner</span>
+              </li>
+            </ul>
+            <button class="btn btn-ghost" data-scroll="#contact">
+              Talk to sales
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-kicker">Contact</div>
+          <h2 class="section-title">Book a product walk-through with our team.</h2>
+          <p class="section-subtitle">
+            Share some basic details about your business and current compliance stack.
+            We’ll follow up with a tailored demo – no generic sales pitch.
+          </p>
+        </div>
+        <div class="contact-grid">
+          <form id="contactForm" novalidate>
+            <div class="field">
+              <label for="name">Full name *</label>
+              <input id="name" name="name" type="text" placeholder="Jane Doe" required />
+              <div class="field-error">Please enter your name.</div>
+            </div>
+            <div class="field">
+              <label for="email">Work email *</label>
+              <input id="email" name="email" type="email" placeholder="you@company.com" required />
+              <div class="field-error">Enter a valid work email.</div>
+            </div>
+            <div class="field">
+              <label for="company">Company *</label>
+              <input id="company" name="company" type="text" placeholder="Acme Bank" required />
+              <div class="field-error">Please enter your company name.</div>
+            </div>
+            <div class="field">
+              <label for="role">Your role</label>
+              <select id="role" name="role">
+                <option value="">Select one</option>
+                <option>Head of Compliance</option>
+                <option>MLRO / AML Officer</option>
+                <option>Risk / Fraud</option>
+                <option>Product / Engineering</option>
+                <option>Founder / CXO</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="volume">Monthly KYC volume (approx.)</label>
+              <select id="volume" name="volume">
+                <option value="">Select one</option>
+                <option>&lt; 1,000</option>
+                <option>1,000 – 10,000</option>
+                <option>10,000 – 100,000</option>
+                <option>&gt; 100,000</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="message">What are you trying to improve?</label>
+              <textarea id="message" name="message" placeholder="e.g. Reduce manual reviews, unify KYC vendors, improve audit trails..."></textarea>
+            </div>
+            <div class="form-footer">
+              <button class="btn btn-primary" type="submit">
+                Request demo
+              </button>
+              <p class="form-note">
+                We’ll reply within <strong>1 business day</strong>. No spam, ever.
+              </p>
+            </div>
+          </form>
+
+          <div class="contact-highlight">
+            <h3>Designed for regulated teams.</h3>
+            <p>
+              Whether you’re launching a new fintech product or replacing legacy tools,
+              ReguFlow gives your compliance team full visibility and control.
+            </p>
+            <div class="contact-meta">
+              <div class="contact-meta-row">
+                <span class="dot"></span>
+                <span>Easy to integrate: REST APIs, webhooks, and event streaming.</span>
+              </div>
+              <div class="contact-meta-row">
+                <span class="dot"></span>
+                <span>Built-in role-based access for compliance, risk, and ops teams.</span>
+              </div>
+              <div class="contact-meta-row">
+                <span class="dot"></span>
+                <span>Data encryption in transit &amp; at rest, audit-ready exports.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="container footer-inner">
+        <div>© <span id="year"></span> ReguFlow, Inc. All rights reserved.</div>
+        <div class="footer-links">
+          <a href="#">Security</a>
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+          <a href="#">Status</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <div class="toast-close" id="toastClose">✕</div>
+    <strong>Request received</strong>
+    <span>Thanks for your interest in ReguFlow. We’ll email you shortly.</span>
+  </div>
+
+  <script>
+    // Smooth scrolling for nav links & buttons
+    document.querySelectorAll("[data-scroll]").forEach(function (el) {
+      el.addEventListener("click", function () {
+        var target = document.querySelector(el.getAttribute("data-scroll"));
+        if (!target) return;
+        document.getElementById("navLinks").classList.remove("open");
+        window.scrollTo({
+          top: target.offsetTop - 70,
+          behavior: "smooth",
+        });
+      });
+    });
+
+    // Mobile nav toggle
+    var navToggle = document.getElementById("navToggle");
+    var navLinks = document.getElementById("navLinks");
+    navToggle.addEventListener("click", function () {
+      navLinks.classList.toggle("open");
+    });
+
+    // Footer year
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // Form validation + fake submit
+    var form = document.getElementById("contactForm");
+    var toast = document.getElementById("toast");
+    var toastClose = document.getElementById("toastClose");
+
+    function showError(field, message) {
+      var error = field.parentElement.querySelector(".field-error");
+      if (error) {
+        error.textContent = message;
+        error.style.display = "block";
+      }
+      field.setAttribute("aria-invalid", "true");
+    }
+
+    function clearError(field) {
+      var error = field.parentElement.querySelector(".field-error");
+      if (error) {
+        error.style.display = "none";
+      }
+      field.removeAttribute("aria-invalid");
+    }
+
+    function validateEmail(value) {
+      return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value);
+    }
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var name = form.name;
+      var email = form.email;
+      var company = form.company;
+
+      var isValid = true;
+
+      [name, email, company].forEach(function (field) {
+        clearError(field);
+        if (!field.value.trim()) {
+          showError(field, "This field is required.");
+          isValid = false;
+        }
+      });
+
+      if (email.value.trim() && !validateEmail(email.value.trim())) {
+        showError(email, "Enter a valid work email.");
+        isValid = false;
+      }
+
+      if (!isValid) return;
+
+      // Simulate success
+      form.reset();
+      toast.style.display = "block";
+      setTimeout(function () {
+        toast.style.display = "none";
+      }, 4500);
+    });
+
+    toastClose.addEventListener("click", function () {
+      toast.style.display = "none";
+    });
+  </script>
+</body>
+</html>
