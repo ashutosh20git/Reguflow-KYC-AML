@@ -60,27 +60,6 @@ Modern fintech teams struggle with:
 4. System auto-approves, rejects, or escalates
 5. Decision + explanation is returned to the product
 
----
 
-## 📸 Demo
 
-Open `index.html` in any modern browser to explore the interactive demo UI.
-
----
-
-## ⚠️ Disclaimer
-
-This is a **hackathon prototype** and **not production-ready software**.  
-No real personal data is processed.
-
----
-
-## 👤 Built By
-
-**Your Name**  
-Hackathon Project | FinTech & Compliance Automation
-
----
-
-## 📄 License
 
