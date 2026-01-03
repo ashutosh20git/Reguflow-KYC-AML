@@ -1062,9 +1062,6 @@
             <button class="btn btn-ghost" data-scroll="#features">
               Explore features
             </button>
-            <button class="btn btn-ghost" id="openDashboardBtn">
-              View anomaly dashboard
-            </button>
           </div>
           <div class="hero-meta">
             <div class="hero-meta-item hero-pill">
@@ -1454,7 +1451,7 @@
     <!-- FOOTER -->
     <footer>
       <div class="container footer-inner">
-        <div> 2023 ReguFlow, Inc. All rights reserved.</div>
+        <div>© <span id="year"></span> ReguFlow, Inc. All rights reserved.</div>
         <div class="footer-links">
           <a href="#">Security</a>
           <a href="#">Privacy</a>
@@ -1494,25 +1491,7 @@
     });
 
     // Footer year
-    (function () {
-      var yearEl = document.getElementById("year");
-      if (yearEl) {
-        yearEl.textContent = new Date().getFullYear();
-      }
-    })();
-
-    // Anomaly dashboard launcher
-    (function () {
-      var btn = document.getElementById("openDashboardBtn");
-      if (!btn) return;
-      btn.addEventListener("click", function () {
-        var userId = window.prompt("Enter user_id (e.g. U0001):");
-        if (!userId) return;
-        userId = String(userId).trim();
-        if (!userId) return;
-        window.location.href = "/user_dashboard?user_id=" + encodeURIComponent(userId);
-      });
-    })();
+    document.getElementById("year").textContent = new Date().getFullYear();
 
     // Form validation + fake submit
     var form = document.getElementById("contactForm");

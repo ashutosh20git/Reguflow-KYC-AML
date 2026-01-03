@@ -88,6 +88,38 @@ def compute_user_window(
     return user_30, daily, anom
 
 
+def compute_fuzzy_decision(user_30: pd.DataFrame) -> Tuple[Optional[float], str]:
+    """Compute latest fuzzy risk score and map it to a decision label.
+
+    The fuzzy output is treated as the primary signal with the following bands:
+
+    - Risk < 30 -> Allow
+    - 30 4 Risk < 60 -> Monitor
+    - 60 4 Risk < 80 -> Block Transaction
+    - Risk d50 80 -> Block + Trigger Re-KYC
+    """
+
+    if "fuzzy_risk_score" not in user_30.columns:
+        return None, "No fuzzy risk score available"
+
+    user_with_score = user_30.dropna(subset=["fuzzy_risk_score"]).sort_values("timestamp")
+    if user_with_score.empty:
+        return None, "No fuzzy risk score available"
+
+    score = float(user_with_score["fuzzy_risk_score"].iloc[-1])
+
+    if score < 0.3:
+        decision = "Allow"
+    elif score < 0.6:
+        decision = "Monitor"
+    elif score < 0.8:
+        decision = "Block Transaction"
+    else:
+        decision = "Block + Trigger Re-KYC"
+
+    return score, decision
+
+
 def create_matplotlib_dashboard(
     user_id: str,
     user_30: pd.DataFrame,
@@ -298,6 +330,8 @@ def user_dashboard() -> "flask.Response":
     STATIC_DIR.mkdir(parents=True, exist_ok=True)
     html_path = STATIC_DIR / "user_last30_anomaly.html"
 
+    fuzzy_score, fuzzy_decision = compute_fuzzy_decision(user_30)
+
     plot_div = create_plotly_dashboard(
         user_id=user_id,
         user_30=user_30,
@@ -308,12 +342,12 @@ def user_dashboard() -> "flask.Response":
     )
 
     template = """<!doctype html>
-<html lang=\"en\">
+<html lang="en">
   <head>
-    <meta charset=\"utf-8\" />
+    <meta charset="utf-8" />
     <title>User {{ user_id }} anomaly dashboard</title>
     <style>
-      body { font-family: system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif; background: #020617; color: #e5e7eb; margin: 0; padding: 1.5rem; }
+      body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #020617; color: #e5e7eb; margin: 0; padding: 1.5rem; }
       a { color: #38bdf8; }
       .container { max-width: 1120px; margin: 0 auto; }
       img { max-width: 100%; height: auto; border-radius: 0.75rem; box-shadow: 0 20px 40px rgba(0,0,0,0.45); margin-bottom: 1.5rem; }
@@ -323,13 +357,18 @@ def user_dashboard() -> "flask.Response":
     </style>
   </head>
   <body>
-    <div class=\"container\">
-      <div class=\"back\"><a href=\"{{ index_url }}\">&#8592; Back to home</a></div>
+    <div class="container">
+      <div class="back"><a href="{{ index_url }}">&#8592; Back to home</a></div>
       <h1>User {{ user_id }} – last 30 days anomaly dashboard</h1>
       <p>Thresholded IsolationForest anomaly score and fuzzy risk are used to flag anomalies.</p>
-      <div class=\"panel\">
+      <div class="panel">
         <h2>Interactive anomaly chart</h2>
         {{ plot_div | safe }}
+      </div>
+      <div class="panel">
+        <h2>Decision</h2>
+        <p><strong>Fuzzy risk score (latest tx):</strong> {{ fuzzy_score if fuzzy_score is not none else "N/A" }}</p>
+        <p><strong>Recommended action:</strong> {{ fuzzy_decision }}</p>
       </div>
     </div>
   </body>
@@ -340,6 +379,8 @@ def user_dashboard() -> "flask.Response":
         user_id=user_id,
         index_url=url_for("index"),
         plot_div=plot_div,
+        fuzzy_score=None if fuzzy_score is None else round(fuzzy_score, 2),
+        fuzzy_decision=fuzzy_decision,
     )
 
 
